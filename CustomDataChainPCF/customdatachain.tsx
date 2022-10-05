@@ -54,11 +54,11 @@ function CustomDataChain(props:any) {
     //Refs
     //-------------------------
     //const elementRef = useRef();
-    let inputRefs: Array<any>;
-    if(customDataElements.elements.length>0) {
-        inputRefs = [customDataElements.elements.length] as Array<any>;
-        customDataElements.elements.forEach((elem,index) => { inputRefs[index] = useRef(); })
-    }
+    //let inputRefs: Array<any>;
+    //if(customDataElements.elements.length>0) {
+    //    inputRefs = [customDataElements.elements.length] as Array<any>;
+    //    customDataElements.elements.forEach((elem,index) => { inputRefs[index] = useRef(); })
+    //}
 
     //-------------------------
     //Init
@@ -146,10 +146,8 @@ function CustomDataChain(props:any) {
     
     function onClickSave() {
         
-        debugger;
-        
         let params = arguments;
-        let refs = inputRefs;
+        //let refs = inputRefs;
 
         //..
     }

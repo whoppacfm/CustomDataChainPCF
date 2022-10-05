@@ -1,5 +1,5 @@
 //React
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, MutableRefObject } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import {Dialog, DialogType, DialogFooter} from 'office-ui-fabric-react/lib/Dialog'
 
@@ -49,7 +49,17 @@ function CustomDataChain(props:any) {
     const [showDialogVisible, setShowDialogVisible] = React.useState({ 
         visible: false
     });
-    
+
+    //-------------------------
+    //Refs
+    //-------------------------
+    //const elementRef = useRef();
+    let inputRefs: Array<any>;
+    if(customDataElements.elements.length>0) {
+        inputRefs = [customDataElements.elements.length] as Array<any>;
+        customDataElements.elements.forEach((elem,index) => { inputRefs[index] = useRef(); })
+    }
+
     //-------------------------
     //Init
     //-------------------------
@@ -83,9 +93,10 @@ function CustomDataChain(props:any) {
         config_lists = props.context.parameters?.Lists?.raw;
     }
     */
-    
+
     //Init data / load data
     useEffect(() => {
+
         if(DATA_SOURCE=="TEST") {
             //Init test data
         }
@@ -133,7 +144,17 @@ function CustomDataChain(props:any) {
     const inputLabelRef = useRef(null);
     const selectLabelRef = useRef(null);
     
-    function createClick() {
+    function onClickSave() {
+        
+        debugger;
+        
+        let params = arguments;
+        let refs = inputRefs;
+
+        //..
+    }
+
+    function onClickCreate() {
         let labelControl = inputLabelRef.current;
         let selectTypeControl = selectLabelRef.current;
 
@@ -144,9 +165,9 @@ function CustomDataChain(props:any) {
         if(customDataElements.elements.length>0) {
             id = Math.max(...customDataElements.elements.map(o => o.id))+1;
         }
-        
+
         let newElement = new CCustomDataElement(id, labelValue, selectTypeValue);
-        customDataElements.elements.push(newElement);
+        customDataElements.elements.unshift(newElement);
         setCustomDataElements({elements:customDataElements.elements});
         
         props.theobj.newvalue = JSON.stringify(customDataElements.elements);
@@ -155,6 +176,9 @@ function CustomDataChain(props:any) {
         (inputLabelRef.current as any).value = "";
         closeDialog();
     }
+
+    
+
 
     return (
         <>
@@ -169,21 +193,21 @@ function CustomDataChain(props:any) {
                         <option value="text">Text</option>
                         <option value="date">Date</option>
                     </select>
-                    <button style={buttonStyle} onClick={createClick}>Create</button>
+                    <button style={buttonStyle} onClick={onClickCreate}>Create</button>
                 </div>
                 <br/>
                 <br/>
                 {/*Custom Data Elements*/}
-                {customDataElements.elements.map((element:CCustomDataElement) => (
-                    <>
-                        <p>{element.label}</p>
+                {customDataElements.elements.map((element:CCustomDataElement, i:number) => (
+                    <div element-id={element.id}>
+                        <p>{element.label}</p><button onClick={onClickSave}>Save</button>
                         {element.type == "text" && 
-                            <input type="text"></input>
+                            <input ref={inputRefs[i]} type="text"></input>
                         }
                         {element.type=="date" &&
-                            <input type="date"></input>
+                            <input ref={inputRefs[i]} type="date"></input>
                         }
-                    </>
+                    </div>
                 ))}
                 <br/>
                 <br/>

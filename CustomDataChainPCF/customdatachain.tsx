@@ -17,10 +17,14 @@ var CRM_TEST_MODE = 0;
 //Data Definitions
 //-------------------------
 class CCustomDataElement {
+    id:number;
     label:string;
     type:string;
     value:string;
-    constructor(label?:string, type?:string, value?:string) {
+    constructor(id?:number, label?:string, type?:string, value?:string) {
+        if(id) {
+            this.id = id;
+        }
         if(label) {
             this.label = label;
         }
@@ -82,19 +86,15 @@ function CustomDataChain(props:any) {
     
     //Init data / load data
     useEffect(() => {
-        //setShowDialogVisible({visible:false});
-
         if(DATA_SOURCE=="TEST") {
             //Init test data
-            //setCustomState({"statevar1": "test123", "statevar2":"test123"});
         }
         else {
             //Load data from crm
-
-            //json string to class -> props.initialValue
-            //setCustomState({"statevar1": "test123", "statevar2":"test123"});
+            if(props.initialValue!=null && props.initialValue.length>0) {
+                customDataElements.elements = JSON.parse(props.initialValue);
+            }
         }
-
     }, []);
 
     //Get data from store
@@ -124,7 +124,7 @@ function CustomDataChain(props:any) {
     if(showDialogVisible.visible) {
         dialogContentStyle = { "display":"block", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "text-align":"left" };
     }
-    
+
     let inputBoxStyle:any = {"width":"100px", "float":"left", "margin-left":"20px"};
     let selectBoxStyle:any = {"width":"100px", "float":"left", "margin-left":"20px"};
     let buttonStyle:any = {"width":"100px", "height":"32px", "margin-left":"20px"};
@@ -134,16 +134,23 @@ function CustomDataChain(props:any) {
     const selectLabelRef = useRef(null);
     
     function createClick() {
-
         let labelControl = inputLabelRef.current;
         let selectTypeControl = selectLabelRef.current;
 
         let labelValue = (labelControl as any)?.value;
         let selectTypeValue = (selectTypeControl as any)?.value;
         
-        let newElement = new CCustomDataElement(labelValue, selectTypeValue);
+        let id = 1;
+        if(customDataElements.elements.length>0) {
+            id = Math.max(...customDataElements.elements.map(o => o.id))+1;
+        }
+        
+        let newElement = new CCustomDataElement(id, labelValue, selectTypeValue);
         customDataElements.elements.push(newElement);
         setCustomDataElements({elements:customDataElements.elements});
+        
+        props.theobj.newvalue = JSON.stringify(customDataElements.elements);
+        props.onChange();
         
         (inputLabelRef.current as any).value = "";
         closeDialog();
@@ -250,7 +257,7 @@ function ShowNewDataElementDialog(props:any) {
 export function Render(context:any, container:any, theobj:object, onchangefunction:any, initialValue:any) {
     const root = ReactDOM.createRoot(container);
     root.render(
-        <div><CustomDataChain context={context} theobj={theobj} onchange={onchangefunction} initialValue={initialValue} /></div>
+        <div><CustomDataChain context={context} theobj={theobj} onChange={onchangefunction} initialValue={initialValue} /></div>
         , container
       );
 }

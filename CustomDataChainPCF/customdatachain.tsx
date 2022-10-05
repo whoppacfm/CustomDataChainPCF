@@ -177,7 +177,7 @@ function CustomDataChain(props:any) {
 
     
 
-
+//ref={inputRefs[i]}
     return (
         <>
             <div style={contentDiv}>
@@ -200,10 +200,10 @@ function CustomDataChain(props:any) {
                     <div element-id={element.id}>
                         <p>{element.label}</p><button onClick={onClickSave}>Save</button>
                         {element.type == "text" && 
-                            <input ref={inputRefs[i]} type="text"></input>
+                            <input type="text"></input>
                         }
                         {element.type=="date" &&
-                            <input ref={inputRefs[i]} type="date"></input>
+                            <input type="date"></input>
                         }
                     </div>
                 ))}

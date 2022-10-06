@@ -50,6 +50,8 @@ function CustomDataChain(props:any) {
         visible: false
     });
 
+    debugger;
+
     //-------------------------
     //Refs
     //-------------------------
@@ -63,9 +65,9 @@ function CustomDataChain(props:any) {
     //-------------------------
 
     //Get current record data
-    let currentFntityId = (props.context.mode as any).contextInfo.entityId;
-    let currentEntityTypeName = (props.context.mode as any).contextInfo.entityTypeName;
-    let currentEntityRecordName = (props.context.mode as any).contextInfo.entityRecordName;
+    let currentFntityId = props.context.mode.contextInfo.entityId;
+    let currentEntityTypeName = props.context.mode.contextInfo.entityTypeName;
+    let currentEntityRecordName = props.context.mode.contextInfo.entityRecordName;
 
     //Get current control field values
 
@@ -94,7 +96,6 @@ function CustomDataChain(props:any) {
 
     //Init data / load data
     useEffect(() => {
-
         if(DATA_SOURCE=="TEST") {
             //Init test data
         }
@@ -121,6 +122,9 @@ function CustomDataChain(props:any) {
     }
     */
 
+    const inputLabelRef = useRef(null);
+    const selectLabelRef = useRef(null);
+
     function closeDialog() {
         setShowDialogVisible({visible:false});
     }
@@ -128,38 +132,25 @@ function CustomDataChain(props:any) {
     function showDialog() {
         setShowDialogVisible({visible:true});
     }
-
-    let dialogContentStyle:any = { "display":"none", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "text-align":"left" };
-    if(showDialogVisible.visible) {
-        dialogContentStyle = { "display":"block", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "text-align":"left" };
-    }
-
-    let inputBoxStyle:any = {"width":"100px", "float":"left", "margin-left":"20px"};
-    let selectBoxStyle:any = {"width":"100px", "float":"left", "margin-left":"20px"};
-    let buttonStyle:any = {"width":"100px", "height":"32px", "margin-left":"20px"};
-    let contentDiv:any={"text-align":"left", "padding":"20px"};
-
-    const inputLabelRef = useRef(null);
-    const selectLabelRef = useRef(null);
     
-    function onClickSave() {
-        
-        debugger;
-
-        let ref_id = parseInt(arguments[0].target.attributes["ref-id"].value);
-        let inpref = inputRefs.current[ref_id];
-        let newValue = (inpref as any).current.value;
-
+    function onChange(event) {
+        //let ref_id = parseInt(arguments[0].target.attributes["ref-id"].value);
+        //let inpref = inputRefs.current[ref_id];
+        //let newValue = (inpref as any).current.value;
+        let newValue = event.target.value;
         let element_id = parseInt(arguments[0].target.attributes["element-id"].value);
-        customDataElements.elements = customDataElements.elements.map((element:CCustomDataElement) => { 
+
+        let newElems = customDataElements.elements.map((element:CCustomDataElement) => { 
             if(element.id==element_id) {
                 element.value=newValue;
             };
             return element;
         });
 
-        setCustomDataElements({elements:customDataElements.elements});
+        props.theobj.newvalue = JSON.stringify(newElems);
+        setCustomDataElements({elements:newElems});
         props.onChange();
+        console.log(JSON.stringify(newElems));
     }
 
     function onClickCreate() {
@@ -181,10 +172,20 @@ function CustomDataChain(props:any) {
         props.theobj.newvalue = JSON.stringify(customDataElements.elements);
         props.onChange();
         
+        console.log(JSON.stringify(customDataElements.elements));
+
         (inputLabelRef.current as any).value = "";
         closeDialog();
     }
 
+    let dialogContentStyle:any = { "display":"none", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "text-align":"left" };
+    if(showDialogVisible.visible) {
+        dialogContentStyle = { "display":"block", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "text-align":"left" };
+    }
+    let inputBoxStyle:any = {"width":"100px", "float":"left", "margin-left":"20px"};
+    let selectBoxStyle:any = {"width":"100px", "float":"left", "margin-left":"20px"};
+    let buttonStyle:any = {"width":"100px", "height":"32px", "margin-left":"20px"};
+    let contentDiv:any={"text-align":"left", "padding":"20px"};    
 
     return (
         <>
@@ -206,12 +207,12 @@ function CustomDataChain(props:any) {
                 {/*Custom Data Elements*/}
                 {customDataElements.elements.map((element:CCustomDataElement, i:number) => (
                     <div element-id={element.id}>
-                        <p>{element.label}</p><button element-id={element.id} ref-id={i} onClick={onClickSave}>Save</button>
+                        <p>{element.label}</p><button style={{'display':'none'}} element-id={element.id} ref-id={i}>Save</button>
                         {element.type == "text" && 
-                            <input value={element.value} ref={inputRefs.current[i]} type="text"></input>
+                            <input onChange={onChange} value={element.value} element-id={element.id} ref={inputRefs.current[i]} type="text"></input>
                         }
                         {element.type=="date" &&
-                            <input value={element.value} ref={inputRefs.current[i]} type="date"></input>
+                            <input onChange={onChange} value={element.value} element-id={element.id} ref={inputRefs.current[i]} type="date"></input>
                         }
                     </div>
                 ))}

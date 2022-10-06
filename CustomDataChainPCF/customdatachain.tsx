@@ -53,12 +53,10 @@ function CustomDataChain(props:any) {
     //-------------------------
     //Refs
     //-------------------------
-    //const elementRef = useRef();
-    //let inputRefs: Array<any>;
-    //if(customDataElements.elements.length>0) {
-    //    inputRefs = [customDataElements.elements.length] as Array<any>;
-    //    customDataElements.elements.forEach((elem,index) => { inputRefs[index] = useRef(); })
-    //}
+    const inputRefs = useRef([]);
+    if(customDataElements.elements.length>0) {
+        inputRefs.current = customDataElements.elements.map((element, i) => inputRefs.current[i] ?? useRef());
+    }
 
     //-------------------------
     //Init
@@ -146,10 +144,22 @@ function CustomDataChain(props:any) {
     
     function onClickSave() {
         
-        let params = arguments;
-        //let refs = inputRefs;
+        debugger;
 
-        //..
+        let ref_id = parseInt(arguments[0].target.attributes["ref-id"].value);
+        let inpref = inputRefs.current[ref_id];
+        let newValue = (inpref as any).current.value;
+
+        let element_id = parseInt(arguments[0].target.attributes["element-id"].value);
+        customDataElements.elements = customDataElements.elements.map((element:CCustomDataElement) => { 
+            if(element.id==element_id) {
+                element.value=newValue;
+            };
+            return element;
+        });
+
+        setCustomDataElements({elements:customDataElements.elements});
+        props.onChange();
     }
 
     function onClickCreate() {
@@ -175,9 +185,7 @@ function CustomDataChain(props:any) {
         closeDialog();
     }
 
-    
 
-//ref={inputRefs[i]}
     return (
         <>
             <div style={contentDiv}>
@@ -198,12 +206,12 @@ function CustomDataChain(props:any) {
                 {/*Custom Data Elements*/}
                 {customDataElements.elements.map((element:CCustomDataElement, i:number) => (
                     <div element-id={element.id}>
-                        <p>{element.label}</p><button onClick={onClickSave}>Save</button>
+                        <p>{element.label}</p><button element-id={element.id} ref-id={i} onClick={onClickSave}>Save</button>
                         {element.type == "text" && 
-                            <input type="text"></input>
+                            <input value={element.value} ref={inputRefs.current[i]} type="text"></input>
                         }
                         {element.type=="date" &&
-                            <input type="date"></input>
+                            <input value={element.value} ref={inputRefs.current[i]} type="date"></input>
                         }
                     </div>
                 ))}

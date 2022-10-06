@@ -34,6 +34,9 @@ class CCustomDataElement {
         if(value) {
             this.value = value;
         }
+        else {
+            this.value="";
+        }
     };
 }
 
@@ -50,15 +53,28 @@ function CustomDataChain(props:any) {
         visible: false
     });
 
-    debugger;
-
+    //Init data / load data
+    //useEffect(() => {
+        if(DATA_SOURCE=="TEST") {
+            //Init test data
+        }
+        else {
+            //Load data from crm
+            if(props.initialValue!=null && props.initialValue.length>0) {
+                if(customDataElements.elements.length==0) {
+                    setCustomDataElements({elements:JSON.parse(props.initialValue)});
+                }
+            }
+        }
+    //}, []);
+    
     //-------------------------
     //Refs
     //-------------------------
     const inputRefs = useRef([]);
-    if(customDataElements.elements.length>0) {
-        inputRefs.current = customDataElements.elements.map((element, i) => inputRefs.current[i] ?? useRef());
-    }
+    inputRefs.current = customDataElements.elements.map((element, i) => inputRefs.current[i] ?? useRef(null));
+    const inputLabelRef = useRef(null);
+    const selectLabelRef = useRef(null);
 
     //-------------------------
     //Init
@@ -94,19 +110,6 @@ function CustomDataChain(props:any) {
     }
     */
 
-    //Init data / load data
-    useEffect(() => {
-        if(DATA_SOURCE=="TEST") {
-            //Init test data
-        }
-        else {
-            //Load data from crm
-            if(props.initialValue!=null && props.initialValue.length>0) {
-                customDataElements.elements = JSON.parse(props.initialValue);
-            }
-        }
-    }, []);
-
     //Get data from store
     /*
     let showStoredata:any;
@@ -121,9 +124,6 @@ function CustomDataChain(props:any) {
         });
     }
     */
-
-    const inputLabelRef = useRef(null);
-    const selectLabelRef = useRef(null);
 
     function closeDialog() {
         setShowDialogVisible({visible:false});
@@ -178,14 +178,14 @@ function CustomDataChain(props:any) {
         closeDialog();
     }
 
-    let dialogContentStyle:any = { "display":"none", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "text-align":"left" };
+    let dialogContentStyle:any = { "display":"none", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "textAlign":"left" };
     if(showDialogVisible.visible) {
-        dialogContentStyle = { "display":"block", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "text-align":"left" };
+        dialogContentStyle = { "display":"block", "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px", "textAlign":"left" };
     }
-    let inputBoxStyle:any = {"width":"100px", "float":"left", "margin-left":"20px"};
-    let selectBoxStyle:any = {"width":"100px", "float":"left", "margin-left":"20px"};
-    let buttonStyle:any = {"width":"100px", "height":"32px", "margin-left":"20px"};
-    let contentDiv:any={"text-align":"left", "padding":"20px"};    
+    let inputBoxStyle:any = {"width":"100px", "float":"left", "marginLeft":"20px"};
+    let selectBoxStyle:any = {"width":"100px", "float":"left", "marginLeft":"20px"};
+    let buttonStyle:any = {"width":"100px", "height":"32px", "marginLeft":"20px"};
+    let contentDiv:any={"textAlign":"left", "padding":"20px"};    
 
     return (
         <>
@@ -243,8 +243,6 @@ function ShowNewDataElementDialog(props:any) {
         //set store customDataElements.elements CCustomDataElement
         //props.theobj.newvalue = newval;
         //props.onchange();
-        
-        debugger;
     }
 
     let dialogContentStyle:any = { "border": "1px solid #bbbbbb", "marginTop":"20px", "marginBottom":"-20px", "padding":"20px" };
@@ -289,7 +287,6 @@ export function Render(context:any, container:any, theobj:object, onchangefuncti
     const root = ReactDOM.createRoot(container);
     root.render(
         <div><CustomDataChain context={context} theobj={theobj} onChange={onchangefunction} initialValue={initialValue} /></div>
-        , container
       );
 }
 

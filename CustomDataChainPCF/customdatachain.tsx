@@ -189,7 +189,7 @@ function CustomDataChain(props:any) {
     let selectBoxStyle:any = {"width":"100px", "float":"left", "marginLeft":"20px"};
     let buttonStyle:any = {"width":"100px", "height":"32px", "marginLeft":"20px"};
     let contentDiv:any={"textAlign":"left", "padding":"20px"};    
-
+    
     return (
         <>
             <div style={contentDiv}>
@@ -209,7 +209,7 @@ function CustomDataChain(props:any) {
                 <br/>
                 {/*Custom Data Elements*/}
                 {customDataElements.elements.map((element:CCustomDataElement, i:number) => (
-                    <div element-id={element.id}>
+                    <div key={element.id} element-id={element.id}>
                         <p>{element.label}</p><button style={{'display':'none'}} element-id={element.id} ref-id={i}>Save</button>
                         {element.type == "text" && 
                             <input onChange={onChange} value={element.value} element-id={element.id} ref={inputRefs.current[i]} type="text"></input>

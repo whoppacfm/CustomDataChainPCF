@@ -35,7 +35,7 @@ class CCustomDataElement {
             this.value = value;
         }
         else {
-            this.value="";
+            this.value = "";
         }
     };
 }
@@ -72,19 +72,22 @@ function CustomDataChain(props:any) {
     //Refs
     //-------------------------
     const inputRefs = useRef([]);
-    inputRefs.current = customDataElements.elements.map((element, i) => inputRefs.current[i] ?? useRef(null));
+    useEffect(() => {
+        inputRefs.current = inputRefs.current.slice(0, customDataElements.elements.length);
+     }, [customDataElements.elements]);    
+
     const inputLabelRef = useRef(null);
     const selectLabelRef = useRef(null);
-
+    
     //-------------------------
     //Init
     //-------------------------
-
+    
     //Get current record data
     let currentFntityId = props.context.mode.contextInfo.entityId;
     let currentEntityTypeName = props.context.mode.contextInfo.entityTypeName;
     let currentEntityRecordName = props.context.mode.contextInfo.entityRecordName;
-
+    
     //Get current control field values
 
     //Lookup Field Example
